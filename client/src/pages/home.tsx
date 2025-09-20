@@ -82,7 +82,7 @@ export default function Home() {
           <Button 
             data-testid="button-find-routes"
             onClick={() => setLocation("/routes")}
-            className="flex-1 py-3 font-semibold flex items-center justify-center space-x-2"
+            className="flex-1 py-3 font-semibold flex items-center justify-center space-x-2 min-h-[44px]"
           >
             <Route className="h-5 w-5" />
             <span>Find Routes</span>
@@ -90,7 +90,7 @@ export default function Home() {
           <Button 
             data-testid="button-book-ride"
             onClick={() => toast({ title: "Book Ride feature coming soon" })}
-            className="flex-1 bg-punjab-saffron hover:bg-punjab-saffron/90 text-white py-3 font-semibold flex items-center justify-center space-x-2"
+            className="flex-1 bg-punjab-saffron hover:bg-punjab-saffron/90 text-white py-3 font-semibold flex items-center justify-center space-x-2 min-h-[44px]"
           >
             <Car className="h-5 w-5" />
             <span>Book Ride</span>

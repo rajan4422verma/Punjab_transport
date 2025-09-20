@@ -35,7 +35,7 @@ export function BottomNavigation() {
                 setLocation(item.path);
               }
             }}
-            className={`flex flex-col items-center space-y-1 transition-colors ${
+            className={`flex flex-col items-center space-y-1 transition-colors min-w-[44px] min-h-[44px] p-2 ${
               isActive ? "text-primary" : "text-muted-foreground"
             }`}
           >
