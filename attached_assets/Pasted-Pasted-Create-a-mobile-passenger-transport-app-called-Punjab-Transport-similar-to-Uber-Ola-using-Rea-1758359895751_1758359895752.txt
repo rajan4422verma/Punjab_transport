@@ -1,0 +1,60 @@
+Pasted-Create-a-mobile-passenger-transport-app-called-Punjab-Transport-similar-to-Uber-Ola-using-Reac-1758271711422_1758271711423.txt
+Create a mobile passenger transport app called "Punjab Transport" (similar to Uber/Ola) using **React + Vite + TailwindCSS**.  
+The app should be functional, not just UI. Use React Router for navigation and React state for interactions.  
+
+🎨 Design System
+- Colors: Primary Blue (#1976D2), White (#FFFFFF), Punjab Saffron (#FF6B35), Punjab Green (#059669), Gray (#F5F5F5).
+- Dark Mode: Background (#121212), Text (#FFFFFF).
+- Font: Inter, bold headings, clean body.
+- Uber-style map-first layout with clean cards.
+
+📱 Core Screens (Phase 1)
+1. **Onboarding**
+   - Placeholder for logo (empty box).
+   - Tagline: “Smart Travel • Made Easy”.
+   - 3 feature cards (Real-time Tracking, Smart Notifications, Journey Planning).
+   - CTA: “Get Started” → navigate to Login.
+
+2. **Authentication**
+   - Login: Phone input (+91 prefix), "Send OTP".
+   - OTP: 6 input boxes with countdown + "Verify & Continue".
+   - Mock validation: any 6 digits accepted → navigate to Home.
+
+3. **Home (Dashboard)**
+   - Full map placeholder (use Leaflet.js or Google Maps API).
+   - Floating search bar: “Where to?”.
+   - Quick action buttons: “Find Routes”, “Book Ride”.
+   - Nearby Stops list: show 3 dummy stops with distance + ETA.
+
+4. **Routes**
+   - Filter chips: All | Popular | Religious | Highway.
+   - Route cards (dummy data): route number, From → To, ETA, status.
+   - Each card has “Track”, “Favorite”, “Share”.
+   - Clicking “Track” → opens Route Details.
+
+5. **Profile**
+   - Profile photo placeholder + name + phone.
+   - Menu items:
+     - Edit Profile
+     - Trip History
+     - Favorite Routes
+     - Notifications
+     - Language
+     - Dark Mode (toggle theme)
+     - Help & Support
+     - Logout
+   - All buttons must navigate or trigger a toast/modal.
+
+📌 Interactivity Rules
+- Use **React Router** for screen navigation.
+- Use **useState** for theme, favorites, and language.
+- Use **toast notifications** for all actions (e.g. “Route saved”, “Profile updated”).
+- Add smooth scrolling for Home, Routes, Profile.
+- Show error if phone/OTP inputs are empty.
+- Dark Mode toggle applies immediately.
+
+⚡ Extras
+- Minimalist Uber-like black/white design with Punjab accents.
+- Responsive layout for mobile-first.
+- Include loading skeletons and button press animations.
+- Don’t just describe—generate complete working React + Tailwind code with all screens, navigation, and state handling.
