@@ -1,5 +1,6 @@
-import { type User, type InsertUser, type Route, type InsertRoute, type UserFavorite, type InsertUserFavorite } from "@shared/schema";
-import { randomUUID } from "crypto";
+import { users, routes, userFavorites, type User, type InsertUser, type Route, type InsertRoute, type UserFavorite, type InsertUserFavorite } from "@shared/schema";
+import { db } from "./db";
+import { eq, and } from "drizzle-orm";
 
 export interface IStorage {
   // Users
@@ -18,148 +19,122 @@ export interface IStorage {
   removeUserFavorite(userId: string, routeId: string): Promise<void>;
 }
 
-export class MemStorage implements IStorage {
-  private users: Map<string, User>;
-  private routes: Map<string, Route>;
-  private userFavorites: Map<string, UserFavorite>;
-
+export class DatabaseStorage implements IStorage {
   constructor() {
-    this.users = new Map();
-    this.routes = new Map();
-    this.userFavorites = new Map();
-    
-    // Initialize with dummy routes
+    // Initialize with dummy routes on first run
     this.initializeRoutes();
   }
 
-  private initializeRoutes() {
-    const dummyRoutes: InsertRoute[] = [
-      {
-        number: "Route #42",
-        fromLocation: "Chandigarh",
-        toLocation: "Mohali",
-        duration: "25 min",
-        distance: "12.5 km",
-        seats: "24 seats",
-        status: "Active",
-        category: ["popular"]
-      },
-      {
-        number: "Route #108",
-        fromLocation: "Gurudwara Sahib",
-        toLocation: "Golden Temple",
-        duration: "45 min",
-        distance: "18.2 km",
-        seats: "30 seats",
-        status: "En Route",
-        category: ["religious"]
-      },
-      {
-        number: "Route #156",
-        fromLocation: "Ludhiana",
-        toLocation: "Delhi",
-        duration: "180 min",
-        distance: "95.4 km",
-        seats: "40 seats",
-        status: "Delayed",
-        category: ["highway", "popular"]
+  private async initializeRoutes() {
+    try {
+      // Check if routes already exist
+      const existingRoutes = await db.select().from(routes);
+      if (existingRoutes.length > 0) {
+        return; // Routes already initialized
       }
-    ];
 
-    dummyRoutes.forEach(route => {
-      const id = randomUUID();
-      const fullRoute: Route = {
-        id,
-        number: route.number,
-        fromLocation: route.fromLocation,
-        toLocation: route.toLocation,
-        duration: route.duration,
-        distance: route.distance,
-        seats: route.seats,
-        status: route.status,
-        category: route.category,
-        createdAt: new Date()
-      };
-      this.routes.set(id, fullRoute);
-    });
+      const dummyRoutes: InsertRoute[] = [
+        {
+          number: "Route #42",
+          fromLocation: "Chandigarh",
+          toLocation: "Mohali",
+          duration: "25 min",
+          distance: "12.5 km",
+          seats: "24 seats",
+          status: "Active",
+          category: ["popular"]
+        },
+        {
+          number: "Route #108",
+          fromLocation: "Gurudwara Sahib",
+          toLocation: "Golden Temple",
+          duration: "45 min",
+          distance: "18.2 km",
+          seats: "30 seats",
+          status: "En Route",
+          category: ["religious"]
+        },
+        {
+          number: "Route #156",
+          fromLocation: "Ludhiana",
+          toLocation: "Delhi",
+          duration: "180 min",
+          distance: "95.4 km",
+          seats: "40 seats",
+          status: "Delayed",
+          category: ["highway", "popular"]
+        }
+      ];
+
+      await db.insert(routes).values(dummyRoutes);
+    } catch (error) {
+      console.log('Routes may already be initialized or error occurred:', error);
+    }
   }
 
   // Users
   async getUser(id: string): Promise<User | undefined> {
-    return this.users.get(id);
+    const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user || undefined;
   }
 
   async getUserByPhone(phone: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find(
-      (user) => user.phone === phone,
-    );
+    const [user] = await db.select().from(users).where(eq(users.phone, phone));
+    return user || undefined;
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
-    const id = randomUUID();
-    const user: User = { 
-      ...insertUser, 
-      id,
-      createdAt: new Date()
-    };
-    this.users.set(id, user);
+    const [user] = await db
+      .insert(users)
+      .values(insertUser)
+      .returning();
     return user;
   }
 
   // Routes
   async getRoutes(): Promise<Route[]> {
-    return Array.from(this.routes.values());
+    return await db.select().from(routes);
   }
 
   async getRoute(id: string): Promise<Route | undefined> {
-    return this.routes.get(id);
+    const [route] = await db.select().from(routes).where(eq(routes.id, id));
+    return route || undefined;
   }
 
   async createRoute(insertRoute: InsertRoute): Promise<Route> {
-    const id = randomUUID();
-    const route: Route = {
-      id,
-      number: insertRoute.number,
-      fromLocation: insertRoute.fromLocation,
-      toLocation: insertRoute.toLocation,
-      duration: insertRoute.duration,
-      distance: insertRoute.distance,
-      seats: insertRoute.seats,
-      status: insertRoute.status,
-      category: insertRoute.category,
-      createdAt: new Date()
-    };
-    this.routes.set(id, route);
+    const [route] = await db
+      .insert(routes)
+      .values(insertRoute)
+      .returning();
     return route;
   }
 
   // User Favorites
   async getUserFavorites(userId: string): Promise<UserFavorite[]> {
-    return Array.from(this.userFavorites.values()).filter(
-      (favorite) => favorite.userId === userId
-    );
+    return await db
+      .select()
+      .from(userFavorites)
+      .where(eq(userFavorites.userId, userId));
   }
 
   async addUserFavorite(insertFavorite: InsertUserFavorite): Promise<UserFavorite> {
-    const id = randomUUID();
-    const favorite: UserFavorite = {
-      ...insertFavorite,
-      id,
-      createdAt: new Date()
-    };
-    this.userFavorites.set(id, favorite);
+    const [favorite] = await db
+      .insert(userFavorites)
+      .values(insertFavorite)
+      .returning();
     return favorite;
   }
 
   async removeUserFavorite(userId: string, routeId: string): Promise<void> {
-    const favoriteToRemove = Array.from(this.userFavorites.entries()).find(
-      ([, favorite]) => favorite.userId === userId && favorite.routeId === routeId
-    );
-    
-    if (favoriteToRemove) {
-      this.userFavorites.delete(favoriteToRemove[0]);
-    }
+    await db
+      .delete(userFavorites)
+      .where(
+        and(
+          eq(userFavorites.userId, userId),
+          eq(userFavorites.routeId, routeId)
+        )
+      );
   }
 }
 
-export const storage = new MemStorage();
+export const storage = new DatabaseStorage();

@@ -1,5 +1,6 @@
 import { sql } from "drizzle-orm";
 import { pgTable, text, varchar, timestamp, jsonb } from "drizzle-orm/pg-core";
+import { relations } from "drizzle-orm";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -29,6 +30,26 @@ export const userFavorites = pgTable("user_favorites", {
   routeId: varchar("route_id").notNull().references(() => routes.id),
   createdAt: timestamp("created_at").defaultNow(),
 });
+
+// Relations
+export const usersRelations = relations(users, ({ many }) => ({
+  favorites: many(userFavorites),
+}));
+
+export const routesRelations = relations(routes, ({ many }) => ({
+  favorites: many(userFavorites),
+}));
+
+export const userFavoritesRelations = relations(userFavorites, ({ one }) => ({
+  user: one(users, {
+    fields: [userFavorites.userId],
+    references: [users.id],
+  }),
+  route: one(routes, {
+    fields: [userFavorites.routeId],
+    references: [routes.id],
+  }),
+}));
 
 export const insertUserSchema = createInsertSchema(users).omit({
   id: true,
